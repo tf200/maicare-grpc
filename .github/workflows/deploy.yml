@@ -2,7 +2,7 @@ name: Deploy gRPC Service to VPS
 
 on:
   push:
-    branches: [ dev ]  # Change to your main branch name if different
+    branches: [ master ]  # Change to your main branch name if different
 
 env:
   DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/maicare-grpc
