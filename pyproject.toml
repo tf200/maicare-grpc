@@ -1,0 +1,26 @@
+[project]
+name = "py-microservice"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "grpcio>=1.74.0",
+    "grpcio-tools>=1.74.0",
+    "pydantic-ai>=0.4.11",
+    "python-dotenv>=1.1.1",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "factory-boy>=3.3.3",
+    "flak>=0.1.5",
+    "grpcio-testing>=1.74.0",
+    "isort>=6.0.1",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
+    "pytest-cov>=6.2.1",
+    "pytest-mock>=3.14.1",
+    "ruff>=0.12.7",
+]
