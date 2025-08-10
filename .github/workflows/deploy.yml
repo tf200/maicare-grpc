@@ -117,16 +117,44 @@ jobs:
             sleep 10
             
             # Health check
-            echo "Performing health check..."
-            if docker exec maicare-grpc python -c "import grpc; import generated.service_pb2_grpc as pb2_grpc; channel = grpc.insecure_channel('localhost:50051'); channel.close(); print('Health check passed')"; then
-              echo "✅ gRPC service is healthy"
-            else
-              echo "❌ gRPC service health check failed"
-              echo "Container logs:"
+            echo "Waiting for gRPC service to be ready..."
+            sleep 10
+
+            echo "Checking gRPC service health..."
+            # Check 1: Container is running
+            if ! docker ps | grep -q maicare-grpc; then
+              echo "gRPC service is not running. Exiting."
+              exit 1
+            fi
+            # Check 2: Port is listening in container
+            if ! docker exec maicare-grpc netstat -tlnp | grep -q ":50051"; then
+              echo "❌ Port 50051 is not listening"
               docker logs maicare-grpc --tail 50
               exit 1
             fi
-            
+
+            # Check 3: Network connectivity test
+            echo "Testing network connectivity..."
+            if docker run --rm --network maicare-network alpine:latest sh -c "timeout 10 sh -c 'echo test | nc maicare-grpc 50051'" >/dev/null 2>&1; then
+              echo "✅ Network connectivity test passed"
+            else
+              echo "❌ Network connectivity test failed"
+              docker logs maicare-grpc --tail 50
+              exit 1
+            fi
+
+            # Check 4: Host connectivity
+            echo "Testing host connectivity..."
+            if timeout 5 bash -c "</dev/tcp/localhost/50051" 2>/dev/null; then
+              echo "✅ Host connectivity test passed"
+            else
+              echo "❌ Host connectivity test failed"
+              docker logs maicare-grpc --tail 50
+              exit 1
+            fi
+
+
+
             echo "=== gRPC Service Deployment Complete ==="
             
             # Clean up unused images
