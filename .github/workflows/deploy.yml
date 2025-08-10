@@ -81,6 +81,7 @@ jobs:
             MAX_WORKERS=20
             LOG_LEVEL=${{ secrets.GRPC_LOG_LEVEL || 'INFO' }}
             ENVIRONMENT=${{ secrets.GRPC_ENVIRONMENT || 'production' }}
+            OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}
             # Add any gRPC-specific environment variables here
             # For example:
             # DATABASE_URL=${{ secrets.GRPC_DATABASE_URL }}
