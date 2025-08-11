@@ -72,6 +72,7 @@ PROMPT = """
   "risk_factors": [
     {{
       "risk": "string",
+      "risk_level": "low|medium|high",
       "mitigation": "string"
     }}
   ],
