@@ -80,7 +80,7 @@ class CarePlannerService(pb2_grpc.CarePlannerServicer):
                     for metric in care_plan.success_metrics
                 ],
                 risk_factors=[
-                    pb2.RiskFactor(risk=risk.risk, mitigation=risk.mitigation)
+                    pb2.RiskFactor(risk=risk.risk, mitigation=risk.mitigation, risk_level=risk.risk_level)
                     for risk in care_plan.risk_factors
                 ],
                 support_network=[
