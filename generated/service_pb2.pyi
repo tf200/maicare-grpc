@@ -135,12 +135,14 @@ class SuccessMetric(_message.Message):
     def __init__(self, metric: _Optional[str] = ..., target: _Optional[str] = ..., measurement_method: _Optional[str] = ...) -> None: ...
 
 class RiskFactor(_message.Message):
-    __slots__ = ("risk", "mitigation")
+    __slots__ = ("risk", "mitigation", "risk_level")
     RISK_FIELD_NUMBER: _ClassVar[int]
     MITIGATION_FIELD_NUMBER: _ClassVar[int]
+    RISK_LEVEL_FIELD_NUMBER: _ClassVar[int]
     risk: str
     mitigation: str
-    def __init__(self, risk: _Optional[str] = ..., mitigation: _Optional[str] = ...) -> None: ...
+    risk_level: str
+    def __init__(self, risk: _Optional[str] = ..., mitigation: _Optional[str] = ..., risk_level: _Optional[str] = ...) -> None: ...
 
 class SupportRole(_message.Message):
     __slots__ = ("role", "responsibility")
