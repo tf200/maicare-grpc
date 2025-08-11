@@ -75,7 +75,8 @@ def mock_llm_response():
         risk_factors=[
             RiskFactor(
                 risk="Fall risk",
-                mitigation="Use of mobility aids and supervised exercises"
+                mitigation="Use of mobility aids and supervised exercises",
+                risk_level="medium"
             )
         ],
         support_network=[
