@@ -39,7 +39,7 @@ class SuccessMetric(BaseModel):
 class RiskFactor(BaseModel):
     risk: str
     mitigation: str
-
+    risk_level: str 
 
 class SupportRole(BaseModel):
     role: str
