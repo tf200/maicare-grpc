@@ -4,8 +4,10 @@ import grpc
 import signal
 import sys
 from concurrent import futures
-import generated.service_pb2_grpc as pb2_grpc
+import generated.service_pb2_grpc as care_planner_pb2_grpc
+import generated.spelling_service_pb2_grpc as spelling_service_pb2_grpc
 from care_planner.planner import CarePlannerService
+from spelling_check.service import SpellingCheckService
 
 # Import logging config first
 from config.logging_config import setup_logging, get_logger
@@ -38,7 +40,10 @@ def serve(port=50051, max_workers=4):
         ],
     )
 
-    pb2_grpc.add_CarePlannerServicer_to_server(CarePlannerService(), server)
+    care_planner_pb2_grpc.add_CarePlannerServicer_to_server(CarePlannerService(), server)
+    spelling_service_pb2_grpc.add_SpellingCorrectionServicer_to_server(SpellingCheckService(), server)
+
+
 
     try:
         listen_address = f"[::]:{port}"

@@ -1,11 +1,13 @@
 import json
 import re
+from venv import create
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
 
 from care_planner.schema import LLMPersonalizedCarePlanResponse
 
+from config.llm_config import create_agent
 from config.logging_config import get_logger
 from config.env_config import get_config
 
@@ -119,22 +121,16 @@ logger = get_logger(__name__)
 config = get_config()
 
 
-model = OpenAIModel(
-    "google/gemini-2.5-flash",
-    provider=OpenRouterProvider(api_key=config.openrouter_api_key),
-)
-
-agent = Agent(
-    model=model,
-    system_prompt=SYSTEM_PROMPT,
-)
-
-
-def genearte_llm_care_plan(inputs: dict) -> LLMPersonalizedCarePlanResponse:
+def generate_llm_care_plan(inputs: dict) -> LLMPersonalizedCarePlanResponse:
     """
     Generate a personalized care plan based on the provided inputs.
     """
     try:
+        agent = create_agent(
+            model_name="google/gemini-2.5-flash",
+            system_prompt=SYSTEM_PROMPT,
+            api_key=config.openrouter_api_key,
+        )
         llm_output: str = agent.run_sync(
             user_prompt=PROMPT.format(inputs=inputs),
         ).output
