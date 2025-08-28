@@ -1,7 +1,7 @@
 from care_planner.schema import LLMPersonalizedCarePlanResponse
 import generated.service_pb2 as pb2
 import generated.service_pb2_grpc as pb2_grpc
-from .llm_config import generate_llm_care_plan
+from .generator import generate_llm_care_plan
 from config.logging_config import get_logger
 
 # Get logger for this module

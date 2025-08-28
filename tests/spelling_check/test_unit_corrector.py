@@ -24,3 +24,8 @@ def test_no_json_block_raises():
         m_agent.return_value.run_sync.return_value.output = bad_output
         with pytest.raises(ValueError, match="No valid JSON found"):
             correct_spelling_llm("foo")
+
+
+
+
+            
