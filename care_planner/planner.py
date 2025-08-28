@@ -1,7 +1,7 @@
 from care_planner.schema import LLMPersonalizedCarePlanResponse
 import generated.service_pb2 as pb2
 import generated.service_pb2_grpc as pb2_grpc
-from .llm_config import genearte_llm_care_plan
+from .generator import generate_llm_care_plan
 from config.logging_config import get_logger
 
 # Get logger for this module
@@ -25,7 +25,7 @@ class CarePlannerService(pb2_grpc.CarePlannerServicer):
             },
         }
         try:
-            care_plan: LLMPersonalizedCarePlanResponse = genearte_llm_care_plan(input)
+            care_plan: LLMPersonalizedCarePlanResponse = generate_llm_care_plan(input)
             response = pb2.PersonalizedCarePlanResponse(
                 client_profile=pb2.ClientProfile(
                     age=care_plan.client_profile.age,

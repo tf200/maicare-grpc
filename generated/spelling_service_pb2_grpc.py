@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import generated.service_pb2 as service__pb2
+import generated.spelling_service_pb2 as spelling__service__pb2
 
 GRPC_GENERATED_VERSION = '1.74.0'
 GRPC_VERSION = grpc.__version__
@@ -18,18 +18,17 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in service_pb2_grpc.py depends on'
+        + f' but the generated code in spelling_service_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
     )
 
 
-class CarePlannerStub(object):
+class SpellingCorrectionStub(object):
     """=======================
     gRPC SERVICE
     =======================
-
     """
 
     def __init__(self, channel):
@@ -38,51 +37,49 @@ class CarePlannerStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GenerateCarePlan = channel.unary_unary(
-                '/grpclient.CarePlanner/GenerateCarePlan',
-                request_serializer=service__pb2.PersonalizedCarePlanRequest.SerializeToString,
-                response_deserializer=service__pb2.PersonalizedCarePlanResponse.FromString,
+        self.CorrectSpelling = channel.unary_unary(
+                '/grpclient.SpellingCorrection/CorrectSpelling',
+                request_serializer=spelling__service__pb2.CorrectSpellingRequest.SerializeToString,
+                response_deserializer=spelling__service__pb2.CorrectSpellingResponse.FromString,
                 _registered_method=True)
 
 
-class CarePlannerServicer(object):
+class SpellingCorrectionServicer(object):
     """=======================
     gRPC SERVICE
     =======================
-
     """
 
-    def GenerateCarePlan(self, request, context):
+    def CorrectSpelling(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_CarePlannerServicer_to_server(servicer, server):
+def add_SpellingCorrectionServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GenerateCarePlan': grpc.unary_unary_rpc_method_handler(
-                    servicer.GenerateCarePlan,
-                    request_deserializer=service__pb2.PersonalizedCarePlanRequest.FromString,
-                    response_serializer=service__pb2.PersonalizedCarePlanResponse.SerializeToString,
+            'CorrectSpelling': grpc.unary_unary_rpc_method_handler(
+                    servicer.CorrectSpelling,
+                    request_deserializer=spelling__service__pb2.CorrectSpellingRequest.FromString,
+                    response_serializer=spelling__service__pb2.CorrectSpellingResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'grpclient.CarePlanner', rpc_method_handlers)
+            'grpclient.SpellingCorrection', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('grpclient.CarePlanner', rpc_method_handlers)
+    server.add_registered_method_handlers('grpclient.SpellingCorrection', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class CarePlanner(object):
+class SpellingCorrection(object):
     """=======================
     gRPC SERVICE
     =======================
-
     """
 
     @staticmethod
-    def GenerateCarePlan(request,
+    def CorrectSpelling(request,
             target,
             options=(),
             channel_credentials=None,
@@ -95,9 +92,9 @@ class CarePlanner(object):
         return grpc.experimental.unary_unary( # type: ignore
             request,
             target,
-            '/grpclient.CarePlanner/GenerateCarePlan',
-            service__pb2.PersonalizedCarePlanRequest.SerializeToString,
-            service__pb2.PersonalizedCarePlanResponse.FromString,
+            '/grpclient.SpellingCorrection/CorrectSpelling',
+            spelling__service__pb2.CorrectSpellingRequest.SerializeToString,
+            spelling__service__pb2.CorrectSpellingResponse.FromString,
             options,
             channel_credentials,
             insecure,
