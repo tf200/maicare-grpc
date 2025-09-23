@@ -127,7 +127,7 @@ def generate_llm_care_plan(inputs: dict) -> LLMPersonalizedCarePlanResponse:
     """
     try:
         agent = create_agent(
-            model_name="google/gemini-2.5-flash",
+            model_name="openai/gpt-5",
             system_prompt=SYSTEM_PROMPT,
             api_key=config.openrouter_api_key,
         )
