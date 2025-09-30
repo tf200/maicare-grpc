@@ -11,6 +11,9 @@ from config.llm_config import create_agent
 from config.logging_config import get_logger
 from config.env_config import get_config
 
+from json_repair import repair_json
+
+
 SYSTEM_PROMPT = """
 You are an AI assistant specializing in creating personalized care plans for youth in care. You will be provided with client assessment data and must generate a 
 comprehensive, evidence-based care plan.
@@ -123,26 +126,32 @@ config = get_config()
 
 
 def generate_llm_care_plan(inputs: dict) -> LLMPersonalizedCarePlanResponse:
-    """
-    Generate a personalized care plan based on the provided inputs.
-    """
     try:
         agent = create_agent(
-            model_name="openai/gpt-5",
+            model_name="x-ai/grok-4-fast",
             system_prompt=SYSTEM_PROMPT,
             api_key=config.openrouter_api_key,
         )
         llm_output: str = agent.run_sync(
             user_prompt=PROMPT.format(inputs=inputs),
         ).output
-        match = re.search(r"```json\s*([\s\S]*?)\s*```", llm_output)
-        if match:
-            json_response = json.loads(match.group(1))
-            validated = LLMPersonalizedCarePlanResponse.model_validate(json_response)
-            return validated
-        else:
-            logger.error("No valid JSON found in the response.")
-            raise ValueError("No valid JSON found in the response.")
+        logger.info(llm_output)
+        
+        # Extract JSON from markdown if present
+        match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", llm_output)
+        json_str = match.group(1) if match else llm_output.strip()
+        
+        # Try to repair malformed JSON
+        try:
+            json_response = json.loads(json_str)
+        except json.JSONDecodeError:
+            logger.warning("Initial JSON parse failed, attempting repair...")
+            repaired = repair_json(json_str)
+            json_response = json.loads(repaired)
+        
+        validated = LLMPersonalizedCarePlanResponse.model_validate(json_response)
+        return validated
+        
     except Exception as e:
         logger.error(f"Error generating care plan: {e}")
         raise e

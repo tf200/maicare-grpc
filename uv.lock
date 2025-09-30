@@ -946,6 +946,15 @@ wheels = [
 ]
 
 [[package]]
+name = "json-repair"
+version = "0.51.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/4f/3a/f30f3c92da3a285dcbe469c50b058f2d349dc9a20fc1b60c3219befda53f/json_repair-0.51.0.tar.gz", hash = "sha256:487e00042d5bc5cc4897ea9c3cccd4f6641e926b732cc09f98691a832485098a", size = 35289 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d0/fc/eb15e39547b29dbf2b786bbbd1e79e7f1d87ec4e7c9ea61786f093181481/json_repair-0.51.0-py3-none-any.whl", hash = "sha256:871f7651ee82abf72efc50a80d3a9af0ade8abf5b4541b418eeeabe4e677e314", size = 26263 },
+]
+
+[[package]]
 name = "jsonschema"
 version = "4.25.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1305,6 +1314,7 @@ dependencies = [
     { name = "grpcio" },
     { name = "grpcio-health-checking" },
     { name = "grpcio-tools" },
+    { name = "json-repair" },
     { name = "pydantic-ai" },
     { name = "python-dotenv" },
 ]
@@ -1328,6 +1338,7 @@ requires-dist = [
     { name = "grpcio", specifier = ">=1.74.0" },
     { name = "grpcio-health-checking", specifier = ">=1.74.0" },
     { name = "grpcio-tools", specifier = ">=1.74.0" },
+    { name = "json-repair", specifier = ">=0.51.0" },
     { name = "pydantic-ai", specifier = ">=0.4.11" },
     { name = "python-dotenv", specifier = ">=1.1.1" },
 ]
