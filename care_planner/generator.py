@@ -109,6 +109,7 @@ PROMPT = """
 8. **Cultural sensitivity:** Consider diverse backgrounds and needs
 9. **Safety-focused:** Always prioritize client wellbeing and safety
 10. **Collaborative:** Include appropriate support network roles
+11. **Json Validation:** Make sure you are following the reauired jsin structure
 
 Remember: This is a professional care planning tool. Be thorough, specific, and practical in all recommendations.
 
