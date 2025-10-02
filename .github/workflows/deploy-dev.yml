@@ -33,8 +33,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ env.DOCKER_IMAGE }}:grpc
-            ${{ env.DOCKER_IMAGE }}:grpc-${{ github.sha }}
+            ${{ env.DOCKER_IMAGE }}:grpc-dev
+            ${{ env.DOCKER_IMAGE }}:grpc-dev-${{ github.sha }}
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
@@ -52,12 +52,12 @@ jobs:
             sudo mkdir -p /opt/maicare-grpc
             sudo chown -R ${{ secrets.VPS_USERNAME }}:${{ secrets.VPS_USERNAME }} /opt/maicare-grpc
             
-            # Create maicare-network if it doesn't exist
-            if ! docker network ls | grep -q maicare-network; then
-              echo "Creating maicare-network..."
-              docker network create maicare-network
+            # Create maicare-dev network if it doesn't exist
+            if ! docker network ls | grep -q maicare-dev; then
+              echo "Creating maicare-dev network..."
+              docker network create maicare-dev
             else
-              echo "Network maicare-network already exists"
+              echo "Network maicare-dev already exists"
             fi
             
             # Login to Docker Hub
@@ -72,7 +72,7 @@ jobs:
             
             # Pull the new image
             echo "Pulling new gRPC image..."
-            docker pull ${{ env.DOCKER_IMAGE }}:grpc
+            docker pull ${{ env.DOCKER_IMAGE }}:grpc-dev
             
             # Create environment file for gRPC service
             echo "Creating gRPC environment file..."
@@ -111,50 +111,45 @@ jobs:
             --env-file /opt/maicare-grpc/app.env \
             --memory="512m" \
             --cpus="1.0" \
-            ${{ env.DOCKER_IMAGE }}:grpc
+            ${{ env.DOCKER_IMAGE }}:grpc-dev
             
             # Wait for container to be ready
             echo "Waiting for gRPC service to be ready..."
             sleep 10
             
             # Health check
-            echo "Waiting for gRPC service to be ready..."
-            sleep 10
-
             echo "Checking gRPC service health..."
             # Check 1: Container is running
-            if ! docker ps | grep -q maicare-grpc; then
+            if ! docker ps | grep -q maicare-grpc-dev; then
               echo "gRPC service is not running. Exiting."
               exit 1
             fi
             # Check 2: Port is listening in container
-            if ! docker exec maicare-grpc netstat -tlnp | grep -q ":50051"; then
+            if ! docker exec maicare-grpc-dev netstat -tlnp | grep -q ":50051"; then
               echo "❌ Port 50051 is not listening"
-              docker logs maicare-grpc --tail 50
+              docker logs maicare-grpc-dev --tail 50
               exit 1
             fi
 
             # Check 3: Network connectivity test
             echo "Testing network connectivity..."
-            if docker run --rm --network maicare-network alpine:latest sh -c "timeout 10 sh -c 'echo test | nc maicare-grpc 50051'" >/dev/null 2>&1; then
+            if docker run --rm --network maicare-dev alpine:latest sh -c "timeout 10 sh -c 'echo test | nc maicare-grpc-dev 50051'" >/dev/null 2>&1; then
               echo "✅ Network connectivity test passed"
             else
               echo "❌ Network connectivity test failed"
-              docker logs maicare-grpc --tail 50
+              docker logs maicare-grpc-dev --tail 50
               exit 1
             fi
 
             # Check 4: Host connectivity
             echo "Testing host connectivity..."
-            if timeout 5 bash -c "</dev/tcp/localhost/50051" 2>/dev/null; then
+            if timeout 5 bash -c "</dev/tcp/localhost/60051" 2>/dev/null; then
               echo "✅ Host connectivity test passed"
             else
               echo "❌ Host connectivity test failed"
-              docker logs maicare-grpc --tail 50
+              docker logs maicare-grpc-dev --tail 50
               exit 1
             fi
-
-
 
             echo "=== gRPC Service Deployment Complete ==="
             
