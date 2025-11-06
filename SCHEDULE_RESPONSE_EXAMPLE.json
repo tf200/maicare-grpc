@@ -1,0 +1,154 @@
+{
+  "status": "optimal",
+  "week": 5,
+  "year": 2025,
+  "shifts": [
+    {
+      "date": "2025-02-03",
+      "day_name": "Monday",
+      "shift_id": 1,
+      "shift_name": "Morning",
+      "start_time": "2025-02-03T08:00:00",
+      "end_time": "2025-02-03T16:00:00",
+      "hours": 8.0,
+      "employees": [
+        {
+          "id": "123e4567-e89b-12d3-a456-426614174000",
+          "name": "John Doe"
+        },
+        {
+          "id": "123e4567-e89b-12d3-a456-426614174001",
+          "name": "Jane Smith"
+        }
+      ]
+    },
+    {
+      "date": "2025-02-03",
+      "day_name": "Monday",
+      "shift_id": 2,
+      "shift_name": "Evening",
+      "start_time": "2025-02-03T16:00:00",
+      "end_time": "2025-02-04T00:00:00",
+      "hours": 8.0,
+      "employees": [
+        {
+          "id": "123e4567-e89b-12d3-a456-426614174002",
+          "name": "Bob Johnson"
+        }
+      ]
+    },
+    {
+      "date": "2025-02-04",
+      "day_name": "Tuesday",
+      "shift_id": 1,
+      "shift_name": "Morning",
+      "start_time": "2025-02-04T08:00:00",
+      "end_time": "2025-02-04T16:00:00",
+      "hours": 8.0,
+      "employees": [
+        {
+          "id": "123e4567-e89b-12d3-a456-426614174001",
+          "name": "Jane Smith"
+        }
+      ]
+    }
+  ],
+  "grid_view": {
+    "days": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "dates": [
+      "2025-02-03",
+      "2025-02-04",
+      "2025-02-05",
+      "2025-02-06",
+      "2025-02-07",
+      "2025-02-08",
+      "2025-02-09"
+    ],
+    "shifts_by_day": {
+      "Monday": {
+        "date": "2025-02-03",
+        "shifts": {
+          "Morning": {
+            "employees": ["John Doe", "Jane Smith"],
+            "hours": 8.0,
+            "start": "08:00",
+            "end": "16:00"
+          },
+          "Evening": {
+            "employees": ["Bob Johnson"],
+            "hours": 8.0,
+            "start": "16:00",
+            "end": "00:00"
+          },
+          "Night": {
+            "employees": [],
+            "hours": 8.0,
+            "start": "00:00",
+            "end": "08:00"
+          }
+        }
+      },
+      "Tuesday": {
+        "date": "2025-02-04",
+        "shifts": {
+          "Morning": {
+            "employees": ["Jane Smith"],
+            "hours": 8.0,
+            "start": "08:00",
+            "end": "16:00"
+          },
+          "Evening": {
+            "employees": ["John Doe"],
+            "hours": 8.0,
+            "start": "16:00",
+            "end": "00:00"
+          },
+          "Night": {
+            "employees": ["Sarah Williams"],
+            "hours": 8.0,
+            "start": "00:00",
+            "end": "08:00"
+          }
+        }
+      }
+    }
+  },
+  "summary": [
+    {
+      "id": "123e4567-e89b-12d3-a456-426614174000",
+      "first_name": "John",
+      "last_name": "Doe",
+      "target": 40.0,
+      "actual": 40.0,
+      "deviation": 0.0,
+      "status": "perfect",
+      "shifts": {
+        "Morning": 5,
+        "Evening": 0,
+        "Night": 0
+      }
+    },
+    {
+      "id": "123e4567-e89b-12d3-a456-426614174001",
+      "first_name": "Jane",
+      "last_name": "Smith",
+      "target": 40.0,
+      "actual": 38.0,
+      "deviation": -2.0,
+      "status": "undertime",
+      "shifts": {
+        "Morning": 3,
+        "Evening": 2,
+        "Night": 0
+      }
+    }
+  ]
+}

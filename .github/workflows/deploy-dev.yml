@@ -1,0 +1,162 @@
+name: Deploy gRPC Service to VPS
+
+on:
+  push:
+    branches: [ dev ]  # Change to your main branch name if different
+
+env:
+  DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/maicare-grpc-dev
+  VPS_APP_DIR: /opt/maicare-grpc  # Directory on your VPS where grpc service will run
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: EC2   # Set this up in GitHub repo settings
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_IMAGE }}:grpc-dev
+            ${{ env.DOCKER_IMAGE }}:grpc-dev-${{ github.sha }}
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            #!/bin/bash
+            set -e
+            
+            echo "=== Starting gRPC Service Deployment ==="
+            
+            # Create app directory if it doesn't exist
+            sudo mkdir -p /opt/maicare-grpc
+            sudo chown -R ${{ secrets.VPS_USERNAME }}:${{ secrets.VPS_USERNAME }} /opt/maicare-grpc
+            
+            # Create maicare-dev network if it doesn't exist
+            if ! docker network ls | grep -q maicare-dev; then
+              echo "Creating maicare-dev network..."
+              docker network create maicare-dev
+            else
+              echo "Network maicare-dev already exists"
+            fi
+            
+            # Login to Docker Hub
+            echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+            
+            # Stop and remove existing container if running
+            if [ "$(docker ps -aq -f name=maicare-grpc-dev)" ]; then
+              echo "Stopping and removing existing gRPC container..."
+              docker stop maicare-grpc-dev
+              docker rm maicare-grpc-dev
+            fi
+            
+            # Pull the new image
+            echo "Pulling new gRPC image..."
+            docker pull ${{ env.DOCKER_IMAGE }}:grpc-dev
+            
+            # Create environment file for gRPC service
+            echo "Creating gRPC environment file..."
+            cat <<EOF > /opt/maicare-grpc/app.env
+            PORT=50051
+            MAX_WORKERS=20
+            LOG_LEVEL=${{ secrets.GRPC_LOG_LEVEL || 'INFO' }}
+            ENVIRONMENT=${{ secrets.GRPC_ENVIRONMENT || 'production' }}
+            OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}
+            # Add any gRPC-specific environment variables here
+            # For example:
+            # DATABASE_URL=${{ secrets.GRPC_DATABASE_URL }}
+            # CACHE_URL=${{ secrets.GRPC_CACHE_URL }}
+            # API_KEY=${{ secrets.GRPC_API_KEY }}
+            EOF
+            
+            # Set proper permissions for env file
+            chmod 644 /opt/maicare-grpc/app.env
+            
+            # Verify the file was created and check permissions
+            echo "Verifying gRPC environment file..."
+            ls -la /opt/maicare-grpc/app.env
+            echo "Current user: $(whoami)"
+            echo "Docker version: $(docker --version)"
+            echo "Testing gRPC env file access:"
+            cat /opt/maicare-grpc/app.env | head -3
+            
+            # Run the new gRPC container
+            echo "Starting new gRPC container..."
+            echo "Using env file: /opt/maicare-grpc/app.env"
+            docker run -d \
+            --name maicare-grpc-dev \
+            --network maicare-dev \
+            -p 60051:50051 \
+            --restart unless-stopped \
+            --env-file /opt/maicare-grpc/app.env \
+            --memory="512m" \
+            --cpus="1.0" \
+            ${{ env.DOCKER_IMAGE }}:grpc-dev
+            
+            # Wait for container to be ready
+            echo "Waiting for gRPC service to be ready..."
+            sleep 10
+            
+            # Health check
+            echo "Checking gRPC service health..."
+            # Check 1: Container is running
+            if ! docker ps | grep -q maicare-grpc-dev; then
+              echo "gRPC service is not running. Exiting."
+              exit 1
+            fi
+            # Check 2: Port is listening in container
+            if ! docker exec maicare-grpc-dev netstat -tlnp | grep -q ":50051"; then
+              echo "❌ Port 50051 is not listening"
+              docker logs maicare-grpc-dev --tail 50
+              exit 1
+            fi
+
+            # Check 3: Network connectivity test
+            echo "Testing network connectivity..."
+            if docker run --rm --network maicare-dev alpine:latest sh -c "timeout 10 sh -c 'echo test | nc maicare-grpc-dev 50051'" >/dev/null 2>&1; then
+              echo "✅ Network connectivity test passed"
+            else
+              echo "❌ Network connectivity test failed"
+              docker logs maicare-grpc-dev --tail 50
+              exit 1
+            fi
+
+            # Check 4: Host connectivity
+            echo "Testing host connectivity..."
+            if timeout 5 bash -c "</dev/tcp/localhost/60051" 2>/dev/null; then
+              echo "✅ Host connectivity test passed"
+            else
+              echo "❌ Host connectivity test failed"
+              docker logs maicare-grpc-dev --tail 50
+              exit 1
+            fi
+
+            echo "=== gRPC Service Deployment Complete ==="
+            
+            # Clean up unused images
+            echo "Cleaning up..."
+            docker image prune -af
+            
+            # Show running containers
+            echo "Running containers:"
+            docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"

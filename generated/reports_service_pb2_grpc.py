@@ -4,7 +4,7 @@
 import grpc
 import warnings
 
-from . import spelling_service_pb2 as spelling__service__pb2
+from . import reports_service_pb2 as reports__service__pb2
 
 GRPC_GENERATED_VERSION = "1.74.0"
 GRPC_VERSION = grpc.__version__
@@ -22,18 +22,15 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f"The grpc package installed is at version {GRPC_VERSION},"
-        + f" but the generated code in spelling_service_pb2_grpc.py depends on"
+        + f" but the generated code in reports_service_pb2_grpc.py depends on"
         + f" grpcio>={GRPC_GENERATED_VERSION}."
         + f" Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}"
         + f" or downgrade your generated code using grpcio-tools<={GRPC_VERSION}."
     )
 
 
-class SpellingCorrectionStub(object):
-    """=======================
-    gRPC SERVICE
-    =======================
-    """
+class ReportGeneratorStub(object):
+    """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
         """Constructor.
@@ -41,53 +38,47 @@ class SpellingCorrectionStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.CorrectSpelling = channel.unary_unary(
-            "/grpclient.SpellingCorrection/CorrectSpelling",
-            request_serializer=spelling__service__pb2.CorrectSpellingRequest.SerializeToString,
-            response_deserializer=spelling__service__pb2.CorrectSpellingResponse.FromString,
+        self.GenerateAutoReport = channel.unary_unary(
+            "/grpclient.ReportGenerator/GenerateAutoReport",
+            request_serializer=reports__service__pb2.PastReports.SerializeToString,
+            response_deserializer=reports__service__pb2.GeneratedReports.FromString,
             _registered_method=True,
         )
 
 
-class SpellingCorrectionServicer(object):
-    """=======================
-    gRPC SERVICE
-    =======================
-    """
+class ReportGeneratorServicer(object):
+    """Missing associated documentation comment in .proto file."""
 
-    def CorrectSpelling(self, request, context):
+    def GenerateAutoReport(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details("Method not implemented!")
         raise NotImplementedError("Method not implemented!")
 
 
-def add_SpellingCorrectionServicer_to_server(servicer, server):
+def add_ReportGeneratorServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        "CorrectSpelling": grpc.unary_unary_rpc_method_handler(
-            servicer.CorrectSpelling,
-            request_deserializer=spelling__service__pb2.CorrectSpellingRequest.FromString,
-            response_serializer=spelling__service__pb2.CorrectSpellingResponse.SerializeToString,
+        "GenerateAutoReport": grpc.unary_unary_rpc_method_handler(
+            servicer.GenerateAutoReport,
+            request_deserializer=reports__service__pb2.PastReports.FromString,
+            response_serializer=reports__service__pb2.GeneratedReports.SerializeToString,
         ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-        "grpclient.SpellingCorrection", rpc_method_handlers
+        "grpclient.ReportGenerator", rpc_method_handlers
     )
     server.add_generic_rpc_handlers((generic_handler,))
     server.add_registered_method_handlers(
-        "grpclient.SpellingCorrection", rpc_method_handlers
+        "grpclient.ReportGenerator", rpc_method_handlers
     )
 
 
 # This class is part of an EXPERIMENTAL API.
-class SpellingCorrection(object):
-    """=======================
-    gRPC SERVICE
-    =======================
-    """
+class ReportGenerator(object):
+    """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def CorrectSpelling(
+    def GenerateAutoReport(
         request,
         target,
         options=(),
@@ -102,9 +93,9 @@ class SpellingCorrection(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/grpclient.SpellingCorrection/CorrectSpelling",
-            spelling__service__pb2.CorrectSpellingRequest.SerializeToString,
-            spelling__service__pb2.CorrectSpellingResponse.FromString,
+            "/grpclient.ReportGenerator/GenerateAutoReport",
+            reports__service__pb2.PastReports.SerializeToString,
+            reports__service__pb2.GeneratedReports.FromString,
             options,
             channel_credentials,
             insecure,
