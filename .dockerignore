@@ -6,9 +6,6 @@ dist/
 wheels/
 *.egg-info
 
-# Generated gRPC files (will be regenerated in Docker)
-generated/
-
 # Virtual environments
 .venv
 .env
