@@ -1,31 +1,42 @@
 # tests/conftest.py
-import os
-import tempfile
+"""Pytest configuration and shared fixtures for all tests."""
+
 from concurrent import futures
-from unittest import mock
 
 import grpc
 import pytest
-from grpc_health.v1 import health_pb2_grpc
+from injector import Injector
 
-from spelling_check.service import SpellingCheckService
-from care_planner.planner import CarePlannerService
+from src.api.spelling_check import SpellingCheckServicer
+from src.api.care_planner import CarePlannerServicer
+from src.di.app_module import AppModule, ServiceModule
 import generated.spelling_service_pb2_grpc as spelling_check_pb2_grpc
 import generated.service_pb2_grpc as care_planner_pb2_grpc
 
 
 @pytest.fixture(scope="session")
-def grpc_server():
+def injector():
+    """Create a dependency injection container for tests."""
+    return Injector([AppModule(), ServiceModule()])
+
+
+@pytest.fixture(scope="session")
+def grpc_server(injector):
     """
     Spin up a *real* grpc server on a free port and yield a connected channel.
     Fixtures that depend on it get a channel that is already connected.
     """
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=2))
+
+    # Get servicers from injector
+    spelling_servicer = injector.get(SpellingCheckServicer)
+    care_planner_servicer = injector.get(CarePlannerServicer)
+
     spelling_check_pb2_grpc.add_SpellingCorrectionServicer_to_server(
-        SpellingCheckService(), server
+        spelling_servicer, server
     )
     care_planner_pb2_grpc.add_CarePlannerServicer_to_server(
-        CarePlannerService(), server
+        care_planner_servicer, server
     )
 
     # pick free port

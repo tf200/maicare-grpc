@@ -1,14 +1,52 @@
 # Python-generated files
 __pycache__/
 *.py[oc]
+*.pyo
+*.pyd
 build/
 dist/
 wheels/
 *.egg-info
+*.egg
 
 # Virtual environments
 .venv
+venv/
+ENV/
+env/
+
+# Environment variables
 .env
-.ruff_cache/
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
 .pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Linting & formatting
+.ruff_cache/
+.mypy_cache/
+.dmypy.json
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+.temp/
 

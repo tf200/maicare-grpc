@@ -1,21 +1,34 @@
 # server.py
+import logging
 import os
 import grpc
 import signal
 import sys
 from concurrent import futures
+from injector import Injector
+
 import generated.service_pb2_grpc as care_planner_pb2_grpc
 import generated.spelling_service_pb2_grpc as spelling_service_pb2_grpc
-from care_planner.planner import CarePlannerService
-from spelling_check.service import SpellingCheckService
+import generated.reports_service_pb2_grpc as reports_service_pb2_grpc
+import generated.schedule_service_pb2_grpc as schedule_service_pb2_grpc
+
+# Import from new API layer
+from src.api.care_planner import CarePlannerServicer
+from src.api.reports import AutoReportGeneratorServicer
+from src.api.spelling_check import SpellingCheckServicer
+from src.api.schedule import ScheduleServicer
+
+# Import DI modules
+from src.di.app_module import AppModule, ServiceModule
 
 # Import logging config first
-from config.logging_config import setup_logging, get_logger
-from config.env_config import get_config
+from src.core.logging import get_logger
 
+injector = Injector([AppModule(), ServiceModule()])
 # Set up logging before importing other modules
-config = get_config()
-setup_logging(env=config.environment, log_level=config.log_level)
+
+config = injector.get(AppModule).provide_config()
+logger: logging.Logger = injector.get(logging.Logger)
 
 # Now import other modules that might use logging
 
@@ -27,6 +40,14 @@ logger = get_logger(__name__)
 def serve(port=50051, max_workers=4):
     """Start the gRPC server"""
     logger.info(f"Starting server with {max_workers} workers on port {port}")
+
+    # Set up dependency injection
+
+    # Create servicers using DI container
+    care_planner_servicer = injector.get(CarePlannerServicer)
+    spelling_servicer = injector.get(SpellingCheckServicer)
+    auto_report_servicer = injector.get(AutoReportGeneratorServicer)
+    schedule_servicer = injector.get(ScheduleServicer)
 
     server: grpc.Server = grpc.server(
         futures.ThreadPoolExecutor(max_workers=max_workers),
@@ -40,10 +61,18 @@ def serve(port=50051, max_workers=4):
         ],
     )
 
-    care_planner_pb2_grpc.add_CarePlannerServicer_to_server(CarePlannerService(), server)
-    spelling_service_pb2_grpc.add_SpellingCorrectionServicer_to_server(SpellingCheckService(), server)
-
-
+    care_planner_pb2_grpc.add_CarePlannerServicer_to_server(
+        care_planner_servicer, server
+    )
+    spelling_service_pb2_grpc.add_SpellingCorrectionServicer_to_server(
+        spelling_servicer, server
+    )
+    reports_service_pb2_grpc.add_ReportGeneratorServicer_to_server(
+        auto_report_servicer, server
+    )
+    schedule_service_pb2_grpc.add_ScheduleServiceServicer_to_server(
+        schedule_servicer, server
+    )
 
     try:
         listen_address = f"[::]:{port}"
