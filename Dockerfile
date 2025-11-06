@@ -16,14 +16,30 @@ COPY pyproject.toml uv.lock ./
 # Install dependencies
 RUN uv sync --frozen --no-cache --no-dev
 
+# Copy proto files and generate gRPC code
+COPY proto ./proto
+RUN mkdir -p generated && \
+    .venv/bin/python -m grpc_tools.protoc \
+        -I./proto \
+        --python_out=./generated \
+        --pyi_out=./generated \
+        --grpc_python_out=./generated \
+        proto/service.proto \
+        proto/spelling_service.proto \
+        proto/reports_service.proto \
+        proto/schedule_service.proto \
+        proto/pdf_service.proto && \
+    sed -i 's/^import \(.*\)_pb2 as/from . import \1_pb2 as/g' generated/*_grpc.py
+
 # Production stage
 FROM python:3.11-alpine
 
 # Create non-root user
 RUN addgroup -S grpcuser && adduser -S grpcuser -G grpcuser
 
-# Copy virtual environment from builder
+# Copy virtual environment and generated proto files from builder
 COPY --from=builder /app/.venv /app/.venv
+COPY --from=builder /app/generated /app/generated
 
 # Set working directory and copy application code
 WORKDIR /app
