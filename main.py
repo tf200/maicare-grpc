@@ -39,7 +39,7 @@ logger = get_logger(__name__)
 
 def serve(port=50051, max_workers=4):
     """Start the gRPC server"""
-    logger.info(f"Starting server with {max_workers} workers on port {port}")
+    logger.info(f"Starting server with {max_workers} and workers on port {port}")
 
     # Set up dependency injection
 
