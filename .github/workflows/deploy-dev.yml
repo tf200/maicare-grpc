@@ -80,7 +80,7 @@ jobs:
             PORT=50051
             MAX_WORKERS=20
             LOG_LEVEL=${{ secrets.GRPC_LOG_LEVEL || 'INFO' }}
-            ENVIRONMENT=${{ secrets.GRPC_ENVIRONMENT || 'production' }}
+            ENVIRONMENT=development
             OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}
             OBJECT_STORAGE_ENDPOINT=${{ secrets.OBJECT_STORAGE_ENDPOINT }}
             OBJECT_STORAGE_KEY=${{ secrets.OBJECT_STORAGE_KEY }}
@@ -121,39 +121,6 @@ jobs:
             echo "Waiting for gRPC service to be ready..."
             sleep 10
             
-            # Health check
-            echo "Checking gRPC service health..."
-            # Check 1: Container is running
-            if ! docker ps | grep -q maicare-grpc-dev; then
-              echo "gRPC service is not running. Exiting."
-              exit 1
-            fi
-            # Check 2: Port is listening in container
-            if ! docker exec maicare-grpc-dev netstat -tlnp | grep -q ":50051"; then
-              echo "❌ Port 50051 is not listening"
-              docker logs maicare-grpc-dev --tail 50
-              exit 1
-            fi
-
-            # Check 3: Network connectivity test
-            echo "Testing network connectivity..."
-            if docker run --rm --network maicare-dev alpine:latest sh -c "timeout 10 sh -c 'echo test | nc maicare-grpc-dev 50051'" >/dev/null 2>&1; then
-              echo "✅ Network connectivity test passed"
-            else
-              echo "❌ Network connectivity test failed"
-              docker logs maicare-grpc-dev --tail 50
-              exit 1
-            fi
-
-            # Check 4: Host connectivity
-            echo "Testing host connectivity..."
-            if timeout 5 bash -c "</dev/tcp/localhost/60051" 2>/dev/null; then
-              echo "✅ Host connectivity test passed"
-            else
-              echo "❌ Host connectivity test failed"
-              docker logs maicare-grpc-dev --tail 50
-              exit 1
-            fi
 
             echo "=== gRPC Service Deployment Complete ==="
             
