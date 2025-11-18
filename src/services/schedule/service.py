@@ -2,6 +2,7 @@ from logging import Logger
 from typing import Optional
 from injector import inject
 from ortools.sat.python import cp_model
+import datetime
 
 from src.services.schedule.schema import (
     EmployeeSchema,
@@ -103,7 +104,7 @@ class ShiftScheduler:
         Returns:
             datetime.date object for that day
         """
-        import datetime
+        
 
         # Get the first day of the ISO week
         jan4 = datetime.date(year, 1, 4)  # January 4th is always in week 1
@@ -122,7 +123,7 @@ class ShiftScheduler:
         Returns:
             datetime.datetime object
         """
-        import datetime
+        
 
         return datetime.datetime.combine(date, time)
 
@@ -285,7 +286,7 @@ class ShiftScheduler:
 
                 # If end time is before start time, shift crosses midnight
                 if shift.end_time < shift.start_time:
-                    end_datetime = end_datetime.replace(day=end_datetime.day + 1)
+                    end_datetime = end_datetime + datetime.timedelta(days=1)
 
                 # Add to flat shifts list
                 shifts_list.append(
