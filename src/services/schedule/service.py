@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Optional
+from typing import Optional, final
 from injector import inject
 from ortools.sat.python import cp_model
 import datetime
@@ -17,6 +17,7 @@ from src.services.schedule.schema import (
 )
 
 
+@final
 class ScheduleService:
     DAYS = [
         "Monday",
@@ -56,6 +57,7 @@ class ScheduleService:
         return result
 
 
+@final
 class ShiftScheduler:
     def __init__(
         self,
@@ -104,7 +106,6 @@ class ShiftScheduler:
         Returns:
             datetime.date object for that day
         """
-        
 
         # Get the first day of the ISO week
         jan4 = datetime.date(year, 1, 4)  # January 4th is always in week 1
@@ -123,7 +124,6 @@ class ShiftScheduler:
         Returns:
             datetime.datetime object
         """
-        
 
         return datetime.datetime.combine(date, time)
 

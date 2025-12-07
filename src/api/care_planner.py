@@ -5,6 +5,8 @@ Migrated from: care_planner/planner.py
 """
 
 from logging import Logger
+from typing import final
+from typing_extensions import override
 import grpc
 from injector import inject
 import generated.service_pb2 as pb2
@@ -14,6 +16,7 @@ from src.services.care_planner.planner import CarePlannerService
 from src.services.care_planner.schemas import LLMPersonalizedCarePlanResponse
 
 
+@final
 class CarePlannerServicer(pb2_grpc.CarePlannerServicer):
     """
     gRPC servicer for Care Planner.
@@ -28,7 +31,7 @@ class CarePlannerServicer(pb2_grpc.CarePlannerServicer):
         self.business_service = care_planner_service
         self.logger = logger
         self.logger.info("CarePlannerServicer initialized")
-
+    @override
     def GenerateCarePlan(self, request: pb2.PersonalizedCarePlanRequest, context):
         """
         Handle gRPC GenerateCarePlan request.
