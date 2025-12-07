@@ -12,7 +12,7 @@ class EmployeeSchema(BaseModel):
 
 
 class ShiftSchema(BaseModel):
-    id: int
+    id: str
     shift_name: str
     start_time: datetime.time  # Changed to time only
     end_time: datetime.time  # Changed to time only
@@ -29,7 +29,7 @@ class ScheduledShiftSchema(BaseModel):
 
     date: str  # ISO format date: "2025-02-03"
     day_name: str  # "Monday", "Tuesday", etc.
-    shift_id: int
+    shift_id: str
     shift_name: str
     start_time: datetime.datetime  # Full datetime with date
     end_time: datetime.datetime  # Full datetime with date
